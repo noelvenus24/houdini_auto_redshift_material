@@ -1,0 +1,1 @@
+houdini_auto_redshift_material
