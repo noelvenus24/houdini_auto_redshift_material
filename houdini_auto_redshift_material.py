@@ -1,5 +1,7 @@
 import hou
 import os
+import re
+import webbrowser
 from hutil.Qt import QtCore, QtUiTools, QtWidgets, QtGui
 
 
@@ -28,6 +30,10 @@ class ShaderCreator(QtWidgets.QWidget):
 
         # Setup "Reload Textures" button
         self.ui.reloadButton.clicked.connect(self.reloadButtonClicked)
+
+        # Setup "Help" button
+        self.ui.helpButton.clicked.connect(lambda: webbrowser.open(
+            'https://github.com/noelvenus24/houdini_auto_redshift_material/wiki'))
 
     def createButtonClicked(self):
         self.create_empty_shadernetwork()
@@ -195,7 +201,6 @@ class ShaderCreator(QtWidgets.QWidget):
         )
 
     def createShaders(self):
-        import re
         # get shader builder node name by user
         self.customName = self.ui.sel_asset_name.text().upper()
 
@@ -231,10 +236,7 @@ class ShaderCreator(QtWidgets.QWidget):
                 for tex in tex_items:
                     image_path = os.path.join(path, tex)
                     image_name = ('.').join(tex.split('.')[:-1])
-                    if self.ui.checkBox.isChecked():
-                        image_type = re.split(r'[ _.]', image_name.lower())[-1]
-                    else:
-                        image_type = tex.split('.')[1].lower()
+                    image_type = re.split(r'[ _.]', image_name.lower())[-1]
                     tmp = mat_builder_node.createNode(
                         'redshift::TextureSampler', image_name)
                     tmp.parm('tex0').set(image_path.replace("\\", "/"))
@@ -296,8 +298,8 @@ class ShaderCreator(QtWidgets.QWidget):
                         'Please type in "Asset Name and Texture set" !')
                     break
             else:
-                if file.count('.') > 1 and file.count('.') < 3:
-                    asset_name = file.split('.')[0]
+                if file.count('.') > 1 and file.count('.') < 4:
+                    asset_name = ('.').join(file.split('.')[:-2])
                     asset_type = file.split('.')[-1]
                     if asset_type in types:
                         if asset_name in list_name:
